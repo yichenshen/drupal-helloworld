@@ -1,0 +1,48 @@
+\documentclass[12pt]{article}
+
+\usepackage{listings}
+\usepackage{helvet}
+\usepackage{sectsty}
+\usepackage[a4paper,left=2.5cm,top=2cm,right=2.5cm,bottom=2cm,bindingoffset=0.5cm]{geometry}
+
+\allsectionsfont{\normalfont\sffamily\bfseries}
+\lstset{breaklines=true,
+        basicstyle={\small\ttfamily}}
+
+\title{\textbf{\textsf{CVWO Assignment 2}}}
+\date{}
+\author{\textsf{Shen Yichen}}
+
+
+\begin{document}
+\maketitle
+
+The aim of this assignment is to expand the HelloWorld module in the CVWO sources to allow for mass import of contacts, which comes in a {name, email} pair.
+
+\section*{Set-up}
+
+The database is set up in MySQL with a additional user account.
+
+\begin{lstlisting}
+User: drupal
+Password: drupal
+Database: drupal
+\end{lstlisting}
+
+\subsection*{Issues}
+
+There was an issue when enabling the CVWO core module. When creating the table \texttt{cvwo\_address}, there was an error from PDO:\@
+
+\begin{lstlisting}
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1067 Invalid default value for `date_create'
+\end{lstlisting}
+
+The issue seem to stem from how \texttt{CURRENT\_TIMESTAMP} is handled by Drupal and MySQL\@. When two \texttt{TIMESTAMP} columns are defined as \texttt{NOT NULL} without any default values, the first column's time-stamp is set to refresh automatically when the record is updated. The second column however, would be set to 0 as default. This behaviour was due to older versions of MySQL restricting the \texttt{CURRENT\_TIMESTAMP} mechanism to a single column.
+
+A workaround is used. One of the columns is first removed from the schema in CVWO core. The module is enabled, and then the column is added back manually. Since current versions of MySQL has lifted the restriction for \texttt{CURRENT\_TIMESTAMP} to be defined on a single column only, both columns are set to use \texttt{CURRENT\_TIMESTAMP}.
+
+\section*{Use Case}
+
+The HelloWorld module would be expanded with a single feature. The user would be able to see a new tab named ``Mass Import''.
+
+\end{document}
