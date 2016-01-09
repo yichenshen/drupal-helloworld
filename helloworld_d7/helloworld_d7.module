@@ -116,6 +116,16 @@ namespace {
 			'access arguments' => array(HelloWorld\ADD_USER_PERM),
 			'type' => MENU_LOCAL_TASK,
 		);
+
+		$items[HelloWorld\MODULE_NAME . '/addn'] = array(
+			'title' => 'Mass Add User Records',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('\CVWO\HelloWorld\helloworld_addn_form'),
+			'file' => 'helloworld_d7_addn.inc',
+			'access callback' => 'user_access',
+			'access arguments' => array(HelloWorld\ADD_USER_PERM),
+			'type' => MENU_LOCAL_TASK,
+		);
 	  
 		$items[HelloWorld\MODULE_NAME . '/edit/%'] = array(
 			'title' => 'Edit User Record',
