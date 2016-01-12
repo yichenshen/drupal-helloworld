@@ -35,16 +35,51 @@ namespace CVWO\HelloWorld {
 	 *
 	 * 1) Ensure that the input is in valid CSV format
 	 * 2) Ensure that each email field is a valid email
+	 *
+	 * As this method needs to parse the CSV to verify it, the results are simply 
+	 * stored in $form_state. Thus, there is no need to reparse the CSV in the submit hook.
 	 */
 	function helloworld_addn_form_validate($form, &$form_state){
-		
+		$csv = $form_state['values']['csv'];
+
+		$csv_lines = explode(PHP_EOL, $csv);
+
+		$csv_array = array();
+
+		foreach ($csv_lines as $entry) {
+
+			$parsed_array = array_map('trim', str_getcsv($entry));
+
+
+			if(count($parsed_array) != 2){
+				form_set_error('csv', 'CSV is invalid! Check the format!');
+				
+				$csv_array = NULL;
+
+				break;
+			} else if (!valid_email_address($parsed_array[1])){
+				form_set_error('csv', $parsed_array[1] . ' is not a valid email address!');
+
+				$csv_array = NULL;
+
+				break;
+			} else{
+				array_push($csv_array, $parsed_array);
+			}
+		}
+
+		//Since we've already parsed the CSV, might as well just save it.
+		if(!is_null($csv_array)){
+			$form_state['values']['parsed_csv'] = $csv_array;
+		}
+
 	}
 
 
 	/**
 	 * Implements form submit.
 	 *
-	 * Takes care of parsing the csv, adding the comments and then entering it into the database.
+	 * Takes care of adding the comments and then entering it into the database.
 	 */
 	function helloword_addn_form_submit($form, &$form_state) {
 
