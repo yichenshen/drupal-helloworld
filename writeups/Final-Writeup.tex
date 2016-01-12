@@ -5,6 +5,7 @@
 \usepackage{listings}
 \usepackage{sectsty}
 
+\usepackage[colorlinks=true, urlcolor=blue]{hyperref}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{enumitem}
@@ -28,9 +29,37 @@
 
 \section*{Accomplishments}
 
-In this assignment, I added a simple mass import component to the CVWO HelloWorld module.
+In this assignment, I added a simple mass import component to the CVWO HelloWorld module. The component comprises of a single tab which allows users to enter a 2 columned CSV input to quickly add users to the HelloWorld table. A third input allows users to add a single comment to each of the newly imported users.
 
+I had some experiences with programming frameworks before this assignment, such as the JIRA bug tracking plugin system, as well as Ruby on Rails. Drupal was totally new to me though. Thus, the assignment was an apt introduction to Drupal, which I found timely, given the complexities I encountered during the course of this assignment.
+
+Firstly, as with almost any framework, the setup could get pretty involved. I read through the instructions with regards to setup prior to my attempt, and made it a point to be familiar with the process before starting. Yet, many problems only emerged during the setup itself.
+
+Firstly, the date module in Drupal was needed as a dependency for the CVWO core module, but it was somehow not included in my default Drupal download. As a result, I had to install that particular module manually.
+
+Next, the CVWO module, without the patch, had relied on a specific behaviour of MySQL when it came to timestamps. As such, the first attempt to install the module resulted in a SQL error. Furthermore, when the module was removed and re-activated, the tables in MySQL remained, which caused further errors in the install script. That had caused me to reinstall Drupal several times till I managed to find out how to totally reset the modules manually (which involved changing the system
+table in Drupal, which I felt was something quite useful that I got out of this assignment).
+
+Implementation wise, I felt that I could have done more. Due to time constraints for this particular assignment, I ended up only implementing the core functions. Still, I was able to get a grasp of how the Drupal framework worked. I was able to understand the execution flow of a form by reading though the given code, as well as through my own exploration by modification.
+
+I almost managed to familiarize myself with the database API of both Drupal and the CVWO module, and was able to briefly modify the add\_user function to allow for multiple inserts in a single statement.
 
 \section*{Manual}
+
+\subsection*{Importing}
+
+The new component is rather straight forward. The user first needs to input the mass import text in CSV (comma separated value). Each row should comprise of a <name>, <email> pair. Leading and trailing whitespaces for each value will be ignored. The user may enter the values enclosed in double quotes, which will allow commas themselves to be used in the values. Double quotes themselves then must be escaped with another double quotes.
+
+More information on the CSV format can be found here: \url{https://tools.ietf.org/html/rfc4180}.
+
+Besides the main records, the user may also specify a comment in the text area below the CSV text area. The comment entered here will be added to each user entry upon import.
+
+\subsection*{Validation}
+
+The input will be verified by the server before it is accepted. The server first checks that the CSV format is valid, i.e.\ exactly 2 values per line. After which, the server will then go though each of the email address values to ensure that they are valid. The import operation will be rejected as a whole if any discrepancies are found. The offending address will be shown in an error message, and the user should then rectify the issue accordingly.
+
+\subsection*{Duplication}
+
+Due to the nature of how records are stored in the HelloWorld module, it is possible to allow for duplicate records to be entered. As such, when a duplicate name/email pair is entered into the form, it will just be added like another distinct record, mirroring the behaviour of the original add interface.
 
 \end{document}
