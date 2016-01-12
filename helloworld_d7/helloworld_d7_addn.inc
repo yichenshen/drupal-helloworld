@@ -72,16 +72,23 @@ namespace CVWO\HelloWorld {
 		if(!is_null($csv_array)){
 			$form_state['values']['parsed_csv'] = $csv_array;
 		}
-
 	}
-
 
 	/**
 	 * Implements form submit.
 	 *
 	 * Takes care of adding the comments and then entering it into the database.
 	 */
-	function helloword_addn_form_submit($form, &$form_state) {
+	function helloworld_addn_form_submit($form, &$form_state) {
+		$parsed_array = $form_state['values']['parsed_csv'];
 
+		if(add_users($parsed_array, $form_state['values']['comments'])){
+			drupal_set_message(t('Successfully imported ' . count($parsed_array) . ' users.'));
+
+			$form_state['redirect'] = MODULE_NAME;			
+		} else{
+			drupal_set_message(t('An error occurred while importing the records! Check that the formats are valid.'));
+			$form_state['rebuild'] = TRUE;
+		}
 	}
 }

@@ -74,6 +74,38 @@ namespace CVWO\HelloWorld {
 	}
 
 	/**
+	 * Function to add many users simultaneously.
+	 * 
+	 * @param $values_nokey
+	 *		An array of arrays with no key. The format should be array(array(<name>, <email>), array(<name>, <email>), ...)
+	 * @param $comment
+	 *		The comment to add to all of the user entries.
+	 */
+	function add_users($values_nokey, $comment){
+		global $user;
+		$username = $user->name;
+		$message = $username . ' added ' . count($values_nokey) . ' users.';
+		$txn = db\transaction();
+
+		try {
+			$query = db\insert(HELLOWORLD_TABLE)->fields(array('name', 'email', 'comment'));
+
+			foreach ($values_nokey as $entry) {
+				$query->values(array('name' => $entry[0], 'email' => $entry[1], 'comment' => $comment));
+			}
+
+			$id = $query->execute();
+		} catch (Exception $e) {
+			$txn->rollback();
+			watchdog_exception('type', $e);
+			return FALSE;
+		}
+
+		$txn->commit($message, ADD_AUDIT ,MODULE_NAME);
+		return $id;
+	}
+
+	/**
 	 * Function updates a current user
 	 *
 	 * @param $form_state
